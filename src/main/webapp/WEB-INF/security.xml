@@ -1,0 +1,42 @@
+<b:beans xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://www.springframework.org/schema/security"
+         xsi:schemaLocation="
+			http://www.springframework.org/schema/security
+			https://www.springframework.org/schema/security/spring-security.xsd
+			http://www.springframework.org/schema/beans
+			https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <http pattern="/login-oauth" security="none"/>
+
+    <http auto-config="false">
+        <intercept-url pattern="/**" access="authenticated"/>
+        <logout logout-url="/logout" logout-success-url="/login-oauth"/>
+        <oauth2-login login-page="/login-oauth"
+                      authorization-request-repository-ref="authorizationRequestRepository"
+                      authorized-client-repository-ref="authorizedClientRepository"/>
+    </http>
+
+    <client-registrations>
+        <client-registration registration-id="github"
+                             client-id="e5488fc4e11297380703"
+                             client-secret="daefd876709b826b181cd84f349e9562ab10224f"
+                             provider-id="github"/>
+    </client-registrations>
+
+    <user-service>
+        <user name="user" password="{noop}password" authorities="ROLE_USER" />
+    </user-service>
+
+    <b:bean id="authorizationRequestRepository" class="org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository"/>
+
+    <b:bean id="authorizedClientService"
+            class="org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService"
+            autowire="constructor"/>
+
+    <b:bean id="authorizedClientRepository"
+            class="org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository">
+        <b:constructor-arg ref="authorizedClientService"/>
+    </b:bean>
+
+</b:beans>
